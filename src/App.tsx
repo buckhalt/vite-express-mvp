@@ -2,9 +2,11 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import trpc from '../server/trpc'
 
 function App() {
   const [count, setCount] = useState(0)
+  const { data, isLoading } = trpc.greeting.useQuery({ name: 'world'});
 
   return (
     <>
@@ -23,6 +25,14 @@ function App() {
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR.
+        </p>
+      </div>
+      <div className="card">
+        <button>
+          add project
+        </button>
+        <p>
+          {isLoading ? 'loading...' : data?.text}
         </p>
       </div>
       <p className="read-the-docs">
