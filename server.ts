@@ -1,9 +1,28 @@
-//e.g server.js
-import express from "express";
-import ViteExpress from "vite-express";
+import { initTRPC } from '@trpc/server';
+import * as trpcExpress from '@trpc/server/adapters/express';
+import express from 'express';
+
+// created for each request
+const createContext = ({
+  req,
+  res,
+}: trpcExpress.CreateExpressContextOptions) => ({}); // no context
+type Context = Awaited<ReturnType<typeof createContext>>;
+
+const t = initTRPC.context<Context>().create();
+const appRouter = t.router({
+  // [...]
+  // router with queries and mutations
+});
 
 const app = express();
 
-app.get("/message", (_, res) => res.send("Hello from express!"));
+app.use(
+  '/trpc',
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  }),
+);
 
-ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
+app.listen(4000);
